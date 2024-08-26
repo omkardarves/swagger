@@ -35,7 +35,7 @@ def get_pydantic_model_schema(model_name, module):
     return None
 
 
-def process_function(module_name, func_name, func, swagger, module):
+def process_function(app_name, module_name, func_name, func, swagger, module):
     """Process each function to update the Swagger paths."""
     try:
         source_code = inspect.getsource(func)
@@ -43,7 +43,7 @@ def process_function(module_name, func_name, func, swagger, module):
 
         pydantic_model_name = find_pydantic_model_in_decorator(tree)
 
-        path = f"/api/method/lms.{module_name}.{func_name}".lower()
+        path = f"/api/method/{app_name}.api.{module_name}.{func_name}".lower()
 
         # Define a mapping of HTTP methods to source code checks
         http_methods = {
@@ -146,26 +146,52 @@ def generate_swagger_json():
         "security": [{"basicAuth": []}],
     }
 
-    file_paths = [
-        "/home/dell/frappe-dir/Espark-bench/apps/lms/lms/cart.py",
-        "/home/dell/frappe-dir/Espark-bench/apps/lms/lms/auth.py",
-        "/home/dell/frappe-dir/Espark-bench/apps/lms/lms/user.py",
-        "/home/dell/frappe-dir/Espark-bench/apps/lms/lms/loan.py",
-    ]
+    frappe_bench_dir = frappe.utils.get_bench_path()
+    file_paths = []
 
+    # Gather all Python files in the `api` folders of each installed app
+    for app in frappe.get_installed_apps():
+        try:
+            # Construct the path to the `api` folder
+            api_dir = os.path.join(frappe_bench_dir, "apps", app, app, "api")
+            
+            # Check if the `api` directory exists
+            if os.path.exists(api_dir) and os.path.isdir(api_dir):
+                # Walk through the `api` directory to gather all `.py` files
+                for root, dirs, files in os.walk(api_dir):
+                    for file in files:
+                        if file.endswith(".py"):
+                            file_paths.append(os.path.join(root, file))
+        except Exception as e:
+            # Log the error and continue with the next app
+            frappe.log_error(f"Error processing app '{app}': {str(e)}")
+            continue
+
+    # Process each Python file found
     for file_path in file_paths:
         try:
-            if os.path.isfile(file_path):
+            if os.path.isfile(file_path) and "jsk" in str(file_path):
+                print(file_path,"file_pathfile_path")
                 module = load_module_from_file(file_path)
                 module_name = os.path.basename(file_path).replace(".py", "")
                 for func_name, func in inspect.getmembers(module, inspect.isfunction):
-                    process_function(module_name, func_name, func, swagger, module)
+                    print(func_name)
+                    process_function("jsk",module_name, func_name, func, swagger, module)
             else:
                 print(f"File not found: {file_path}")
         except Exception as e:
             frappe.log_error(f"Error loading or processing file {file_path}: {str(e)}")
 
-    with open("swagger.json", "w") as swagger_file:
+    # Save the generated Swagger JSON to a file
+    www_dir = os.path.join(frappe_bench_dir, "apps", "swagger", "swagger","www")
+
+    # Ensure the www directory exists
+    if not os.path.exists(www_dir):
+        os.makedirs(www_dir)
+
+    # Define the full path to the file to be written
+    file_path = os.path.join(www_dir, "swagger.json")
+    with open(file_path, "w") as swagger_file:
         json.dump(swagger, swagger_file, indent=4)
 
     frappe.msgprint("Swagger JSON generated successfully.")
