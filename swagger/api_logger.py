@@ -35,7 +35,7 @@ def log_api_error(mess=""):
             )
         else:
             message = (
-                "Customer ID : {}\n\nRequest Parameters : {}\n\nHeaders : {}".format(
+                "User Id : {}\n\nRequest Parameters : {}\n\nHeaders : {}".format(
                     str(user_name), str(request_parameters), str(headers)
                 )
             )

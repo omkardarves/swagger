@@ -1,0 +1,83 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-27 09:54:19.409773",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_settings_section",
+  "app_name",
+  "column_break_yztn",
+  "generate_swagger_json",
+  "auth_settings_section",
+  "token_based_basicauth",
+  "column_break_lxux",
+  "bearerauth"
+ ],
+ "fields": [
+  {
+   "fieldname": "basic_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Settings"
+  },
+  {
+   "default": "Frappe",
+   "fieldname": "app_name",
+   "fieldtype": "Data",
+   "label": "App Name"
+  },
+  {
+   "fieldname": "column_break_yztn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "generate_swagger_json",
+   "fieldtype": "Button",
+   "label": "Generate Swagger Json"
+  },
+  {
+   "fieldname": "auth_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Auth Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "token_based_basicauth",
+   "fieldtype": "Check",
+   "label": "Token Based (BasicAuth)"
+  },
+  {
+   "fieldname": "column_break_lxux",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "bearerauth",
+   "fieldtype": "Check",
+   "label": "BearerAuth"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-08-27 09:58:48.621772",
+ "modified_by": "Administrator",
+ "module": "Swagger UI",
+ "name": "Swagger Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

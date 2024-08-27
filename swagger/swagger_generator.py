@@ -31,7 +31,7 @@ def get_pydantic_model_schema(model_name, module):
     if hasattr(module, model_name):
         model = getattr(module, model_name)
         if issubclass(model, BaseModel):
-            return model.schema()
+            return model.model_json_schema()
     return None
 
 
@@ -128,10 +128,11 @@ def load_module_from_file(file_path):
 @frappe.whitelist(allow_guest=True)
 def generate_swagger_json():
     """Generate Swagger JSON documentation."""
+    swagger_settings = frappe.get_single("Swagger Settings")
     swagger = {
         "openapi": "3.0.0",
         "info": {
-            "title": "Frappe API",
+            "title": f"{swagger_settings.app_name} API",
             "version": "1.0.0",
         },
         "paths": {},
