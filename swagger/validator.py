@@ -5,6 +5,7 @@ from functools import wraps
 from pydantic import BaseModel, ValidationError
 from typing import Type
 import swagger
+from .responder import respond
 
 def validate(data, rules):
 	valid, valid_data, errors = validate_(data, rules, return_info=True)
@@ -31,13 +32,10 @@ def validate_request(model: Type[BaseModel]):
                 return func(validated_data)
             except ValidationError as e:
                 swagger.log_api_error()
-                return {
-                    "status": "error",
-                    "message": "Validation error",
-                    "errors": e.errors(),
-                }
+                return respond(status=422, message="Validation error", errors=e.errors())
             except Exception as e:
-                return {"status": "error", "message": str(e)}
+                swagger.log_api_error()
+                return respond(status=422, message=str(e))
         wrapper._model = model
         return wrapper
     return decorator
