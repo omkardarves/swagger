@@ -137,6 +137,8 @@ def load_module_from_file(file_path):
 def generate_swagger_json():
     """Generate Swagger JSON documentation."""
     swagger_settings = frappe.get_single("Swagger Settings")
+    
+    # Initialize the Swagger specification
     swagger = {
         "openapi": "3.0.0",
         "info": {
@@ -145,15 +147,30 @@ def generate_swagger_json():
         },
         "paths": {},
         "components": {
-            "securitySchemes": {
-                "basicAuth": {
-                    "type": "http",
-                    "scheme": "basic",
-                }
-            }
+            # "securitySchemes": {}
         },
-        "security": [{"basicAuth": []}],
+        # "security": []
     }
+
+    # Add security schemes based on the Swagger Settings
+    if swagger_settings.token_based_basicauth or swagger_settings.bearerauth:
+        swagger["components"].update({"securitySchemes":{}})
+        swagger.update({"security":[]})
+
+    if swagger_settings.token_based_basicauth:
+        swagger["components"]["securitySchemes"]["basicAuth"] = {
+            "type": "http",
+            "scheme": "basic",
+        }
+        swagger["security"].append({"basicAuth": []})
+
+    if swagger_settings.bearerauth:
+        swagger["components"]["securitySchemes"]["bearerAuth"] = {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+        }
+        swagger["security"].append({"bearerAuth": []})
 
     frappe_bench_dir = frappe.utils.get_bench_path()
     file_paths = []
