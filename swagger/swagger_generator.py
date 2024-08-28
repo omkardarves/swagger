@@ -41,6 +41,14 @@ def process_function(app_name, module_name, func_name, func, swagger, module):
         source_code = inspect.getsource(func)
         tree = ast.parse(source_code)
 
+        # Check if validate_http_method("METHOD_NAME") is present in the function's source code
+        if not any(
+            "validate_http_method" in ast.dump(node) and isinstance(node, ast.Call)
+            for node in ast.walk(tree)
+        ):
+            print(f"Skipping {func_name}: 'validate_http_method' not found")
+            return
+
         pydantic_model_name = find_pydantic_model_in_decorator(tree)
 
         path = f"/api/method/{app_name}.api.{module_name}.{func_name}".lower()
