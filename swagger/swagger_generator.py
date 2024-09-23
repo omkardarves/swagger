@@ -229,20 +229,20 @@ def generate_swagger_json():
                 for root, dirs, files in os.walk(api_dir):
                     for file in files:
                         if file.endswith(".py"):
-                            file_paths.append(os.path.join(root, file))
+                            file_paths.append((app,os.path.join(root, file)))
         except Exception as e:
             # Log any errors encountered while processing the app
             frappe.log_error(f"Error processing app '{app}': {str(e)}")
             continue
 
     # Process each Python file found
-    for file_path in file_paths:
+    for app,file_path in file_paths:
         try:
-            if os.path.isfile(file_path) and "jsk" in str(file_path):
+            if os.path.isfile(file_path) and app in str(file_path):
                 module = load_module_from_file(file_path)
                 module_name = os.path.basename(file_path).replace(".py", "")
                 for func_name, func in inspect.getmembers(module, inspect.isfunction):
-                    process_function("jsk", module_name, func_name, func, swagger, module)
+                    process_function(app, module_name, func_name, func, swagger, module)
             else:
                 print(f"File not found: {file_path}")
         except Exception as e:
